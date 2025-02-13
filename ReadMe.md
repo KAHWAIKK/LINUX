@@ -303,3 +303,61 @@ command1 || command2
 The double pipe || is a logical "or". Depending on the result of the first command, the second command will either run or be skipped.
 
 With the double pipe, if the first command runs successfully, the second command is skipped; if the first command fails, then the second command is run. In other words, you are essentially telling the shell, "Either run this first command or the second one”.
+
+# Getting Help
+
+# Man Pages
+UNIX is the operating system that Linux was modeled after. The developers of UNIX created help documents called man pages (short for manual pages).
+
+Man pages are used to describe the features of commands. They provide a basic description of the purpose of the command, as well as details regarding available options.
+
+To view a man page for a command, use the man command:
+
+man command
+For example, the following displays the man page for the ls command:
+
+sysadmin@localhost:~$ man ls
+
+To exit viewing a man page, use the Q key.
+
+# Searching Man Pages
+
+To search a man page for a term, type the / character followed by a search term, then hit the Enter key. The program searches from the current location down towards the bottom of the page to try to locate and highlight the term.
+
+# Man Pages Categorized by Sections
+
+Until now, we have been displaying man pages for commands. However, there are several different types of commands (user commands, system commands, and administration commands), configuration files and other features, such as libraries and kernel components, that require documentation.
+
+As a result, there are thousands of man pages on a typical Linux distribution. To organize all of these man pages, they are categorized by sections.
+
+By default, there are nine sections of man pages:
+
+General Commands
+System Calls
+Library Calls
+Special Files
+File Formats and Conventions
+Games
+Miscellaneous
+System Administration Commands
+Kernel Routines
+
+The man command searches each of these sections in order until it finds the first match. For example, if you execute the command man cal, the first section (General Commands) is searched for a man page called cal. If not found, then the second section is searched. If no man page is found after searching all sections, an error message is returned:
+
+To determine which section a specific man page belongs to, look at the numeric value on the first line of the output of the man page. For example, the cal command belongs to the first section of man pages:
+
+#  Finding Commands and Documentation
+The whatis command (or man -f) returns what section a man page is stored in. This command occasionally returns unusual output, such as the following:
+
+#Where Are These Commands Located?
+To search for the location of a command or the man pages for a command, use the whereis command. This command searches for commands, source files and man pages in specific locations where these files are typically stored:
+
+# Find Any File or Directory
+The whereis command is specifically designed to find commands and man pages. While this is useful, it is often necessary to find a file or directory, not just files that are commands or man pages.
+
+To find any file or directory, use the locate command. This command searches a database of all files and directories that were on the system when the database was created. Typically, the command to generate this database is run nightly.
+
+Any files created today will not be searchable with the locate command. If root access is available, it’s possible to update the locate database manually by running the updatedb command. Regular users cannot update the database file.
+
+# Using the Help Option
+Many commands will provide basic information, very similar to the SYNOPSIS found in man pages, by simply using the --help option to the command. This option is useful to learn the basic usage of a command quickly without leaving the command line:

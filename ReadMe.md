@@ -361,3 +361,238 @@ Any files created today will not be searchable with the locate command. If root 
 
 # Using the Help Option
 Many commands will provide basic information, very similar to the SYNOPSIS found in man pages, by simply using the --help option to the command. This option is useful to learn the basic usage of a command quickly without leaving the command line:
+
+# NAVIGATING THE FILE System
+
+Like Windows, the Linux directory structure, typically called a filesystem, also has a top level. However instead of My Computer, it is called the root directory, and it is symbolized by the slash / character. Additionally, there are no drives in Linux; each physical device is accessible under a directory, as opposed to a drive letter.
+
+The following image shows a visual representation of a typical Linux filesystem:
+
+# Home Directory
+The term home directory often confuses new Linux users. To begin with, on most Linux distributions there is a directory called home under the root / directory.
+
+Under this /home directory there is a directory for each user on the system. The directory name is the same as the name of the user, so a user named sysadmin would have a home directory called /home/sysadmin.
+
+# Recursive Listing
+There are times when you want to display all of the files in a directory as well as all of the files in all subdirectories under that directory. This is called a recursive listing.
+
+To perform a recursive listing, use the -R option to the ls command:
+
+sysadmin@localhost:~$ ls -R /etc/ppp
+/etc/ppp:
+ip-down.d  ip-up.d         
+
+/etc/ppp/ip-down.d:
+bind9
+
+/etc/ppp/ip-up.d:
+bind9
+
+Note that in the previous example, the files in the /etc/ppp directory were listed first. After that, the contents of its subdirectories /etc/ppp/ip-down.d and /etc/ppp/ip-up.d were listed.
+
+#  Sort a Listing
+By default, the ls command sorts files alphabetically by file name. Sometimes, it may be useful to sort files using different criteria.
+
+To sort files by size, we can use the -S option. Note the difference in the output of the following two commands. The same files and directories are listed, but in a different order:
+
+While the -S option works by itself, it is most useful when used with the -l option so the file sizes are visible. The following command lists files from largest to smallest and displays the actual size of the file.
+
+# The following command will list files by modification date, oldest to newest:
+
+sysadmin@localhost:~$ ls -lrt /etc/ssh                                 
+total 580
+-rw-r--r-- 1 root root   3264 Feb 10  2018 sshd_config
+-rw-r--r-- 1 root root   1580 Feb 10  2018 ssh_config
+-rw-r--r-- 1 root root 553122 Feb 10  2018 moduli
+-rw-r--r-- 1 root root    338 Jul 19 06:52 ssh_import_id
+-rw-r--r-- 1 root root    399 Jul 19 06:52 ssh_host_rsa_key.pub
+-rw------- 1 root root   1679 Jul 19 06:52 ssh_host_rsa_key
+-rw-r--r-- 1 root root     99 Jul 19 06:52 ssh_host_ed25519_key.pub
+-rw------- 1 root root    411 Jul 19 06:52 ssh_host_ed25519_key
+-rw-r--r-- 1 root root    179 Jul 19 06:52 ssh_host_ecdsa_key.pub
+-rw------- 1 root root    227 Jul 19 06:52 ssh_h
+
+
+# MANAGING FILES AND directories
+
+It is important to note that everything in Linux is case-sensitive, a feature carried over from Unix. This means that the shell recognizes a lowercase a-z character as completely different from an uppercase A-Z character. When manipulating files, pay attention to your capitalization: a hello.txt file is different from HELLO.txt and Hello.txt files.
+
+# GLOBBING 
+
+Globbing
+Glob characters are often referred to as wild cards. These are symbol characters that have special meaning to the shell.
+
+**  Asterisk * Character
+The asterisk * character is used to represent zero or more of any character in a filename. For example, to display all of the files in the /etc directory that begin with the letter t:
+
+sysadmin@localhost:~$ echo /etc/t*                              
+/etc/terminfo /etc/timezone /etc/tmpfiles.d
+
+You can use the asterisk character at any place within the filename pattern. For example, the following matches any filename in the /etc directory that ends with .d:
+
+sysadmin@localhost:~$ echo /etc/*.d                                 
+/etc/apparmor.d /etc/binfmt.d /etc/cron.d /etc/depmod.d /e
+
+In the next example, all of the files in the /etc directory that begin with the letter r and end with .conf are displayed:
+
+sysadmin@localhost:~$ echo /etc/r*.conf                             
+/etc/resolv.conf /etc/rsyslog.conf
+
+# Question Mark ? Character
+The question mark ? character represents any single character. Each question mark character matches exactly one character, no more and no less.
+
+Suppose you want to display all of the files in the /etc directory that begin with the letter t and have exactly 7 characters after the t character:
+
+sysadmin@localhost:~$ echo /etc/t???????      
+/etc/terminfo /etc/timezone
+
+Glob characters can be used together to find even more complex patterns. The pattern /etc/*???????????????????? command only matches files in the /etc directory with twenty or more characters in the filename:
+
+sysadmin@localhost:~$ echo /etc/*????????????????????            
+/etc/bindresvport.blacklist /etc/ca-certificates.con
+
+The asterisk and question mark could also be used together to look for files with three-letter extensions by using the /etc/*.??? pattern:
+
+sysadmin@localhost:~$ echo /etc/*.???                
+/etc/issue.net /etc/locale.gen
+
+# Bracket [ ] Characters
+The bracket [] characters are used to match a single character by representing a range of characters that are possible match characters. For example, the /etc/[gu]* pattern matches any file that begins with either a g or u character and contains zero or more additional characters:
+
+sysadmin@localhost:~$ echo /etc/[gu]*                              
+/etc/gai.conf /etc/groff /etc/group /etc/group- /etc/gshadow /etc/gshadow- /etc/
+gss /etc/ucf.conf /etc/udev /etc/ufw /etc/update-motd.d /etc/updatedb.conf      
+
+Brackets can also be used to a represent a range of characters. For example, the /etc/[a-d]* pattern matches all files that begin with any letter between and including a and d:
+
+sysadmin@localhost:~$ echo /etc/[a-d]*
+/etc/adduser.conf /etc/alternatives /etc/apparmor /et
+
+
+The /etc/*[0-9]* pattern displays any file that contains at least one number:
+
+sysadmin@localhost:~$ echo /etc/*[0-9]*                            
+/etc/X11 /etc/dbus-1 /etc/iproute2 /etc/mke2fs.conf /e
+
+#  Exclamation Point ! Character
+The exclamation point ! character is used in conjunction with the square brackets to negate a range. For example, the pattern /etc/[!DP]* matches any file that does not begin with a D or P.
+
+# Listing With Globs
+
+There is a simple solution to this problem: always use the -d option with globs, which tells the ls command to display the name of directories, instead of their contents:
+
+sysadmin@localhost:~$ls -d /etc/x*                                             
+/etc/xdg
+
+# Copying Files
+The cp command is used to copy files. It requires a source and a destination. The structure of the command is as follows:
+
+cp source destination
+
+The source is the file to be copied. The destination is where the copy is to be located. When successful, the cp command does not have any output (no news is good news). The following command copies the /etc/hosts file to your home directory:
+
+sysadmin@localhost:~$ cp /etc/hosts ~                                     
+sysadmin@localhost:~$ ls
+Desktop    Downloads  Pictures  Templates  hosts                          
+Documents  Music      Public    Videos          
+
+Reminder: The ~ character represents your home directory.
+
+#  Verbose Mode
+The -v option causes the cp command to produce output if successful. The -v option stands for verbose:
+
+sysadmin@localhost:~$ cp -v /etc/hosts ~                              
+`/etc/hosts' -> `/home/sysadmin/hosts'
+
+# Avoid Overwriting Data
+The cp command can be destructive to existing data if the destination file already exists. In the case where the destination file exists, the cp command overwrites the existing file's contents with the contents of the source file.
+
+To answer n to each prompt automatically, use the -n option. It stands for no clobber, or no overwrite.
+
+# Copying Directories
+By default, the cp command will not copy directories; any attempt to do so results in an error message:
+
+
+However, the recursive -r option allows the cp command to copy both files and directories.
+
+cp -r source_directory destination_directory
+
+
+Be careful with this option. The entire directory structure will be copied which could result in copying a lot of files and directories!
+
+NOTE : 
+
+Consider This
+
+The options -r and -R serve the same purpose. However, -R can be used with most commands, while -r can have different meanings with some commands. For example, while cp -r means copy recursively (both files and directories), ls -r means reverse sort.
+
+# Moving Files
+To move a file, use the mv command. The syntax for the mv command is much like the cp command:
+
+mv source destination
+
+In the following example, the hosts file that was generated previously is moved from the current directory to the Videos directory:
+
+sysadmin@localhost:~$ ls                                               
+Desktop    Downloads  Pictures  Templates  example.txt  hosts.copy     
+Documents  Music      Public    Videos     hosts                       
+sysadmin@localhost:~$ mv hosts Videos                                  
+sysadmin@localhost:~$ ls                                               
+Desktop    Downloads  Pictures  Templates  example.txt                 
+Documents  Music      Public    Videos     hosts.copy                 
+sysadmin@localhost:~$ ls Videos                                        
+hosts   
+
+When a file is moved, the file is removed from the original location and placed in a new location. Moving files can be somewhat tricky in Linux because users need specific permissions to remove files from a directory. Without the right permissions, a Permission denied error message is returned:
+
+# Renaming Files
+The mv command is not just used to move a file, but also to rename a file. If the destination for the mv command is a directory, the file is moved to the directory specified. The name of the file only changes if a destination file name is also specified.
+
+sysadmin@localhost:~$ ls                                               
+Desktop    Downloads  Pictures  Templates  example.txt                          
+Documents  Music      Public    Videos     hosts.copy                 
+sysadmin@localhost:~$ mv example.txt Videos/newexample.txt             
+sysadmin@localhost:~$ ls
+Desktop    Downloads  Pictures  Templates  hosts.copy                           
+Documents  Music      Public    Videos                               
+sysadmin@localhost:~$ ls Videos                                       
+hosts  newexample.txt                                                  
+If a destination directory is not specified, the file is renamed using the destination file name and remains in the source directory. For example, the following commands renames the newexample.txt file to myfile.txt:
+
+# Additional Move Options
+Like the cp command, the mv command provides the following options:
+
+‌⁠​​⁠​
+Option	Meaning
+-i	Interactive: Ask if a file is to be overwritten.
+-n	No Clobber: Do not overwrite a destination file's contents.
+-v	Verbose: Show the resulting move.
+Important
+
+There is no -r option as the mv command moves directories by default.
+
+# Creating Files
+
+To create an empty file, use the touch command as demonstrated below:
+
+#  Removing Files
+To delete a file, use the rm command:
+
+Warning
+
+The files are permanently deleted. There is no command to undelete a file and no trash can from which to recover deleted files.
+
+As a precaution, users should use the -i option when deleting multiple files:
+
+# Removing Directories
+You can delete directories using the rm command. However, the default behavior (no options) of the rm command is to not delete directories:
+
+sysadmin@localhost:~$ rm Videos                                        
+rm: cannot remove `Videos': Is a directory 
+
+To delete a directory with the rm command, use the -r recursive option:
+
+When a user deletes a directory, all of the files and subdirectories are deleted without any interactive question. It is best to use the -i option with the rm command.
+
+# Creating Directories
+To create a directory, use the mkdir command:

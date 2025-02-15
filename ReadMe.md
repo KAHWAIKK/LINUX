@@ -596,3 +596,221 @@ When a user deletes a directory, all of the files and subdirectories are deleted
 
 # Creating Directories
 To create a directory, use the mkdir command:
+
+
+# ARCHIVING AND COMPRENSION
+
+File archiving is used when one or more files need to be transmitted or stored as efficiently as possible. There are two fundamental aspects which this chapter explores:
+
+Archiving: Combines multiple files into one, which eliminates the overhead in individual files and makes the files easier to transmit.
+Compression: Makes the files smaller by removing redundant information.
+
+Benefits of archiving :
+    When making a large number of files available, such as the source code to an application or a collection of documents, it is easier for people to download a compressed archive than it is to download files individually.
+
+    Log files have a habit of filling disks, so it is helpful to split them by date and compress older versions.
+    When backing up directories, it is easier to keep them all in one archive than it is to version (update) each file.
+
+    Some streaming devices such as tapes perform better if you’re sending a stream of data rather than individual files.
+
+    It can often be faster to compress a file before sending it to a tape drive or over a slower network and decompress it at the other end than it would be to send it uncompressed.
+
+    Linux provides several tools to compress files; the most common is gzip. Here we show a file before and after compression:
+
+    sysadmin@localhost:~$ cd Documents
+sysadmin@localhost:~/Documents$ ls -l longfile*
+-rw-r--r-- 1 sysadmin sysadmin 66540 Dec 20  2017 longfile.txt
+sysadmin@localhost:~/Documents$ gzip longfile.txt
+sysadmin@localhost:~/Documents$ ls -l longfile*
+-rw-r--r-- 1 sysadmin sysadmin 341 Dec 20  2017 longfile.txt.gz
+
+In the preceding example, there is a file called longfile.txt that is 66540 bytes. The file is compressed by invoking the gzip command with the name of the file as the only argument. After that command completes, the original file is gone, and a compressed version with a file extension of .gz is left in its place. The file size is now 341 bytes.
+
+The gzip command will provide this information, by using the –l option, as shown here:
+
+sysadmin@localhost:~/Documents$ gzip -l longfile.txt.gz
+         compressed        uncompressed  ratio uncompressed_name
+                341               66540  99.5% lo
+
+Compressed files can be restored to their original form using either the gunzip command or the gzip –d command. This process is called decompression. After gunzip does its work, the longfile.txt file is restored to its original size and file name.
+
+There are other commands that operate virtually identically to gzip and gunzip. These include bzip2 and bunzip2, as well as xz and unxz
+
+# ARCHIVING
+
+If you had several files to send to someone, you could choose to compress each one individually. You would have a smaller amount of data in total than if you sent uncompressed files, however, you would still have to deal with many files at one time.
+
+Archiving is the solution to this problem. The traditional UNIX utility to archive files is called tar, which is a short form of TApe aRchive. It was used to stream many files to a tape for backups or file transfer. The tar command takes in several files and creates a single output file that can be split up again into the original files on the other end of the transmission.
+
+The tar command has three modes that are helpful to become familiar with:
+
+Create: Make a new archive out of a series of files.
+Extract: Pull one or more files out of an archive.
+List: Show the contents of the archive without extracting.
+
+
+** CREATE MODE **
+
+ Create Mode
+tar -c [-f ARCHIVE] [OPTIONS] [FILE...]
+Creating an archive with the tar command requires two named options:
+
+Option	Function
+-c	Create an archive.
+-f ARCHIVE	
+Use archive file.
+
+The argument ARCHIVE will be the name of the resulting archive file.
+
+All the remaining arguments are considered as input file names, either as a wildcard, a list of files, or both.
+
+The following example shows a tar file, also called a tarball, being created from multiple files. The first argument creates an archive called alpha_files.tar. The wildcard option * is used to include all files that begin with alpha in the archive:
+
+    sysadmin@localhost:~/Documents$ tar -cf alpha_files.tar alpha*
+    sysadmin@localhost:~/Documents$ ls -l alpha_files.tar
+    -rw-rw-r-- 1 sysadmin sysadmin 10240 Oct 31 17:07 alpha_files.tar
+
+The final size of alpha_files.tar is 10240 bytes. Normally, tarball files are slightly larger than the combined input files due to the overhead information on recreating the original files. Tarballs can be compressed for easier transport, either by using gzip on the archive or by having tar do it with the -z option.
+
+Option	Function
+-z	Compress (or decompress) an archive using the gzip command.
+
+The next example shows the same command as the prior example, but with the addition of the -z option.
+
+sysadmin@localhost:~/Documents$ tar -czf alpha_files.tar.gz alpha*
+sysadmin@localhost:~/Documents$ ls -l alpha_files.tar.gz
+-rw-rw-r-- 1 sysadmin sysadmin 417 Oct 31 17:15 alpha_files.tar.gz
+
+The output is much smaller than the tarball itself, and the resulting file is compatible with gzip, which can be used to view the compression details. The uncompressed file is the same size as it would be if you tarred it in a separate step:
+
+    sysadmin@localhost:~/Documents$ gzip -l alpha_files.tar.gz
+         compressed        uncompressed  ratio uncompressed_name
+                417               10240  96.1% alpha_files.tar
+
+
+** List Mode **
+
+tar -t [-f ARCHIVE] [OPTIONS]
+Given a tar archive, compressed or not, you can see what’s in it by using the -t option. The next example uses three options:
+
+Option	Function
+-t	List the files in an archive.
+-j	Decompress with an bzip2 command.
+-f ARCHIVE	Operate on the given archive.
+
+To list the contents of the folders.tbz archive:
+
+sysadmin@localhost:~/Documents$ tar -tjf folders.tbz
+School/
+School/Engineering/
+School/Engineering/hello.sh
+School/Art/
+School/Art/linux.txt
+School/Math/
+School/Math/numbers.txt
+
+# Extract Mode
+
+tar -x [-f ARCHIVE] [OPTIONS]
+Creating archives is often used to make multiple files easier to move. Before extracting the files, relocate them to the Downloads directory:
+
+    sysadmin@localhost:~/Documents$ cd ~
+    sysadmin@localhost:~$ cp Documents/folders.tbz Downloads/folders.tbz
+    sysadmin@localhost:~$ cd Downloads
+
+Finally, you can extract the archive with the –x option once it’s copied into a different directory. The following example uses a similar pattern as before, specifying the operation, the compression, and a file name to operate on.
+
+
+Option	Function
+-x	Extract files from an archive.
+-j	Decompress with the bzip2 command.
+-f ARCHIVE	Operate on the given archive.
+
+sysadmin@localhost:~/Downloads$ tar -xjf folders.tbz
+sysadmin@localhost:~/Downloads$ ls -l
+total 8
+drwx------ 5 sysadmin sysadmin 4096 Dec 20  2017 School
+-rw-rw-r-- 1 sysadmin sysadmin  413 Oct 31 18:37 folders.tbz
+
+The original file is untouched, and the new directory is created. Inside the directory, are the original directories and files.
+
+sysadmin@localhost:~/Downloads$ cd School
+sysadmin@localhost:~/Downloads/School$ ls -l
+total 12
+drwx------ 2 sysadmin sysadmin 4096 Oct 31 17:45 Art
+drwx------ 2 sysadmin sysadmin 4096 Oct 31 17:47 Engineering
+drwx------ 2 sysadmin sysadmin 4096 Oct 31 17:46 Math
+
+Add the –v flag and you will get a verbose output of the files processed, making it easier to keep track of what's happening:
+
+Option	Function
+-v	Verbosely list the files processed.
+
+The next example repeats the prior example, but with the addition of the –v option:
+
+sysadmin@localhost:~/Downloads$ tar -xjvf folders.tbz
+School/
+School/Engineering/
+School/Engineering/hello.sh
+School/Art/
+School/Art/linux.txt
+School/Math/
+School/Math/numbers.txt
+
+# ZIP Files
+The de facto archiving utility in Microsoft is the ZIP file. ZIP is not as prevalent in Linux but is well supported by the zip and unzip commands. Albeit, with tar and gzip/gunzip the same commands and options can be used interchangeably to do the creation and extraction, but this is not the case with zip. The same option has different meanings for the two different commands.
+
+The default mode of zip is to add files to an archive and compress it.
+
+zip [OPTIONS] [zipfile [file…]]
+The first argument zipfile is the name of the archive to be created, after that, a list of files to be added. The following example shows a compressed archive called alpha_files.zip being created:
+
+sysadmin@localhost:~/Documents$ zip alpha_files.zip alpha*
+  adding: alpha-first.txt (deflated 32%)
+  adding: alpha-second.txt (deflated 36%)
+  adding: alpha-third.txt (deflated 48%)
+  adding: alpha.txt (deflated 53%)
+  adding: alpha_files.tar.gz (stored 0%)
+
+  The output shows the files and the compression ratio.
+
+It should be noted that tar requires the –f option to indicate a filename is being passed, while zip and unzip require a filename and therefore don’t need you to inform the command a filename is being passed.
+
+The zip command will not recurse into subdirectories by default, which is different behavior than the tar command. That is, merely adding School will only add the empty directory and not the files under it. If you want tar like behavior, you must use the –r option to indicate recursion is to be used:
+
+sysadmin@localhost:~/Documents$ zip -r School.zip School
+updating: School/ (stored 0%)
+updating: School/Engineering/ (stored 0%)
+updating: School/Engineering/hello.sh (deflated 88%)
+updating: School/Art/ (stored 0%)
+updating: School/Art/linux.txt (deflated 49%)
+updating: School/Math/ (stored 0%)
+updating: School/Math/numbers.txt (stored 0%)
+  adding: School/Art/red.txt (deflated 33%)
+  adding: School/Art/hidden.txt (deflated 1%)
+  adding: School/Art/animals.txt (deflated 2%)
+
+In the example above, all files under the School directory are added because it uses the –r option. The first lines of output indicate that directories were added to the archive, but otherwise the output is similar to the previous example.
+
+The –l list option of the unzip command lists files in .zip archives:
+
+sysadmin@localhost:~/Documents$ unzip -l School.zip
+Archive:  School.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  2017-12-20 16:46   School/
+        0  2018-10-31 17:47   School/Engineering/
+      647  2018-10-31 17:47   School/Engineering/hello.sh
+        0  2018-10-31 19:31   School/Art/
+       83  2018-10-31 17:45   School/Art/linux.txt
+        0  2018-10-31 17:46   School/Math/
+       10  2018-10-31 17:46   School/Math/numbers.txt
+       51  2018-10-31 19:31   School/Art/red.txt
+       67  2018-10-31 19:30   School/Art/hidden.txt
+       42  2018-10-31 19:31   School/Art/animals.txt
+---------                     -------
+      900                     10 files
+        0  2018-10-31 17:46   School/Math/
+       10  2018-10-31 17:46   School/Math/numbers.txt
+---------                     -------
+      740                     7 files

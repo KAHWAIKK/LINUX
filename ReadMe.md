@@ -813,4 +813,163 @@ Archive:  School.zip
         0  2018-10-31 17:46   School/Math/
        10  2018-10-31 17:46   School/Math/numbers.txt
 ---------                     -------
-      740                     7 files
+      740                     7 files 
+
+# WORKING WITH text
+
+ **  Viewing Files in the Terminal **
+
+. One of the most popular uses of cat is to display the content of text files. To display a file in the standard output using the cat command, type the command followed by the filename:
+
+sysadmin@localhost:~$ cd Documents
+sysadmin@localhost:~/Documents$ cat food.txt 
+Food is good.
+
+
+Although the terminal is the default output of this command, the cat command can also be used for redirecting file content to other files or input for another command by using redirection characters.
+
+ # Viewing Files Using a Pager
+While viewing small files with the cat command poses no problems, it is not an ideal choice for large files. The cat command doesn't provide any easy ways to pause and restart the display, so the entire file contents are dumped to the screen.
+
+For larger files, use a pager command to view the contents. Pager commands display one page of data at a time, allowing you to move forward and backward in the file by using movement keys.
+
+There are two commonly used pager commands:
+
+The less command provides a very advanced paging capability. It is usually the default pager used by commands like the man command.
+The more command has been around since the early days of UNIX. While it has fewer features than the less command, however, the less command isn't included with all Linux distributions. The more command is always available.
+
+# Pager Movement Commands
+To view a file with the less command, pass the file name as an argument:
+
+sysadmin@localhost:~/Documents$ less words
+
+The first group of movement commands to focus on are the ones that are most commonly used. To make it even more convenient, the keys that are identical in more and less are summarized below in order to demonstrate how to move in more and less at the same time:
+
+‌⁠​​⁠​ 
+Key	Movement
+Spacebar	Window forward
+B	        Window backward
+Enter	    Line forward
+Q	        Exit
+H	        Help
+
+# Pager Searching Commands
+There are two ways to search in the less command: searching forward or backward from your current position.
+
+To start a search to look forward from your current position, use the slash / key. Then, type the text or pattern to match and press the Enter key.
+
+Abdul
+Abdul's
+Abe
+/frog
+If a match can be found, then the cursor moves in the document to the match. For example, in the following graphic the expression "frog" was searched for in the words file:
+
+bullfrog
+bullfrog's
+bullfrogs
+bullheaded
+bullhorn
+bullhorn's
+Notice that "frog" didn't have to be a word by itself. Also notice that while the less command moved to the first match from the current position, all matches were highlighted.
+
+If no matches forward from your current position can be found, then the last line of the screen will report Pattern not found:
+
+Pattern not found (press RETURN)
+
+# Head and Tail
+The head and tail commands are used to display only the first few or last few lines of a file, respectively (or, when used with a pipe, the output of a previous command). By default, the head and tail commands display ten lines of the file that is provided as an argument.
+
+Passing a number as an option will cause both the head and tail commands to output the specified number of lines, instead of the standard ten. For example to display the last five lines of the /etc/sysctl.conf file use the -5 option:
+
+# Command Line Pipes
+The pipe | character can be used to send the output of one command to another. Typically, when a command has output or generates an error, the output is displayed to the screen; however, this does not have to be the case. Instead of being printed to the screen, the output of one command becomes input for the next command. This tool can be powerful, especially when looking for specific data; piping is often used to refine the results of an initial command.
+
+The following example displays only the first ten lines:
+
+sysadmin@localhost:~$ ls /etc | head
+X11
+adduser.conf
+alternatives
+apparmor
+apparmor.d
+apt
+bash.bashrc
+bind
+bindresvport.blacklist
+binfmt.d
+
+It is important to carefully choose the order in which commands are piped, as each command only sees input from the previous command. The examples below illustrate this using the nl command, which adds line numbers to the output. In the first example, the nl command is used to number the lines of the output of the preceding ls command:
+
+sysadmin@localhost:~$ ls /etc/ssh | nl
+     1  moduli
+     2  ssh_config
+     3  ssh_host_ecdsa_key
+     4  ssh_host_ecdsa_key.pub
+     5  ssh_host_ed25519_key
+     6  ssh_host_ed25519_key.pub
+     7  ssh_host_rsa_key
+     8  ssh_host_rsa_key.pub
+     9  ssh_import_id
+    10  sshd_config
+In the next example, note that the ls command is executed first and its output is sent to the nl command, numbering all of the lines from the output of the ls command. Then the tail command is executed, displaying the last five lines from the output of the nl command:
+
+sysadmin@localhost:~$ ls /etc/ssh | nl | tail -5
+     6  ssh_host_ed25519_key.pub
+     7  ssh_host_rsa_key
+     8  ssh_host_rsa_key.pub
+     9  ssh_import_id
+    10  sshd_config
+Compare the output above with the next example:
+
+sysadmin@localhost:~$ ls /etc/ssh | tail -5 | nl
+     1  ssh_host_ed25519_key.pub
+     2  ssh_host_rsa_key
+     3  ssh_host_rsa_key.pub
+     4  ssh_import_id
+     5  sshd_config
+Notice how the line numbers are different. Why is this?
+
+In the second example, the output of the ls command is first sent to the tail command which only grabs the last five lines of the output. Then the tail command sends those five lines to the nl command, which numbers them 1-5.
+
+#  STDOUT
+STDOUT can be directed to files. To begin, observe the output of the following echo command which displays to the screen:
+
+sysadmin@localhost:~$ echo "Line 1"
+Line 1
+Using the > character, the output can be redirected to a file instead:
+
+sysadmin@localhost:~$ echo "Line 1" > example.txt
+This command displays no output because STDOUT was sent to the file example.txt instead of the screen. You can see the new file with the output of the ls command.
+
+sysadmin@localhost:~$ ls
+Desktop    Downloads  Pictures  Templates  example.txt
+Documents  Music      Public    Videos   
+The file contains the output of the echo command, which can be viewed with the cat command:
+
+sysadmin@localhost:~$ cat example.txt                                  
+Line 1
+It is important to realize that the single arrow overwrites any contents of an existing file:
+
+sysadmin@localhost:~$ cat example.txt
+Line 1
+sysadmin@localhost:~$ echo "New line 1" > example.txt
+sysadmin@localhost:~$ cat example.txt
+New line 1
+The original contents of the file are gone, replaced with the output of the new echo command.
+
+It is also possible to preserve the contents of an existing file by appending to it. Use two arrow >> characters to append to a file instead of overwriting it:
+
+sysadmin@localhost:~$ cat example.txt
+New line 1
+sysadmin@localhost:~$ echo "Another line" >> example.txt
+sysadmin@localhost:~$ cat example.txt
+New line 1
+Another line
+Instead of being overwritten, the output of the echo command is added to the bottom of the file.
+
+#  Sorting Files or Input
+The sort command can be used to rearrange the lines of files or input in either dictionary or numeric order
+
+# Viewing File Statistics
+The wc command provides the number of lines, words and bytes (1 byte = 1 character in a text file) for a file, and a total line count if more than one file is specified. By default, the wc command allows for up to three statistics to be printed for each file provided, as well as the total of these statistics if more than one filename is provided:
+

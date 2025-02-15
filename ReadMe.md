@@ -973,3 +973,91 @@ The sort command can be used to rearrange the lines of files or input in either 
 # Viewing File Statistics
 The wc command provides the number of lines, words and bytes (1 byte = 1 character in a text file) for a file, and a total line count if more than one file is specified. By default, the wc command allows for up to three statistics to be printed for each file provided, as well as the total of these statistics if more than one filename is provided:
 
+
+# BASIC SCRIPTING 
+
+Shell Scripts in a Nutshell
+A shell script is a file of executable commands that has been stored in a text file. When the file is run, each command is executed. Shell scripts have access to all the commands of the shell, including logic. A script can therefore test for the presence of a file or look for particular output and change its behavior accordingly. You can build scripts to automate repetitive parts of your work, which frees your time and ensures consistency each time you use the script. For instance, if you run the same five commands every day, you can turn them into a shell script that reduces your work to one command.
+
+A script can be as simple as one command:
+
+echo "Hello, World!"
+
+# Scripting Basics
+
+You got your first taste of scripting earlier in this chapter where we introduced a very basic script that ran a single command. The script started with the shebang (or hashbang) line, telling Linux that /bin/bash (which is Bash) is to be used to execute the script.
+
+Other than running commands, there are 3 topics you must become familiar with:
+
+1.Variables, which hold temporary information in the script
+2.Conditionals, which let you do different things based on tests you write
+3.Loops, which let you do the same thing over and over
+
+Linux scripting involves writing a series of commands in a file to automate tasks, reduce repetitive work, and enhance system efficiency. The most common type of scripting in Linux is Bash scripting
+
+# 2. Variables in Bash
+Variables store data that can be reused in the script.
+
+bash
+Copy
+Edit
+#!/bin/bash
+name="John"
+echo "Hello, $name!"
+Variables are assigned without spaces.
+Use $variable to access the value.
+
+
+#  Conditional Statements
+If-Else Condition
+bash
+Copy
+Edit
+#!/bin/bash
+echo "Enter a number:"
+read num
+
+if [ $num -gt 10 ]; then
+    echo "Number is greater than 10"
+else
+    echo "Number is 10 or less"
+fi
+-gt means greater than, other comparisons include:
+-lt (less than)
+-eq (equal to)
+-ne (not equal to)
+-ge (greater than or equal to)
+-le (less than or equal to )
+
+#  Loops in Bash
+1.For Loop
+
+#!/bin/bash
+for i in {1..5}
+do
+    echo "Iteration $i"
+done
+
+2.While Loop
+
+#!/bin/bash
+counter=1
+while [ $counter -le 5 ]
+do
+    echo "Count: $counter"
+    ((counter++))
+done
+
+
+# Functions in Bash
+
+#!/bin/bash
+greet() {
+    echo "Hello, $1!"
+}
+
+greet "Alice"
+greet "Bob"
+
+Functions allow code reuse.
+$1 is the first argument passed to the function.

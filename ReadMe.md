@@ -1241,3 +1241,213 @@ Beware that deleting a user without deleting their home directory means that the
 To delete the user, home directory, and mail spool as well, use the -r option:
 
 root@localhost:~# userdel -r jane
+
+# SUMMARY
+
+Create a new group with the groupadd command
+Make changes to groups using the groupmod command
+Create a new user with the useradd command
+Set and reset a user's password with the passwd command
+Make changes to the user account with the usermod command
+
+# NOTE
+
+Use the groupmod command with the -n option to change the name of the sales group.
+
+Now use the groupmod command with the -g option to change the GID for the group.
+
+# File ownership can be confirmed using the long listing -l option of the ls command. Use this command to view the contents of the new directories:
+
+ls -l priv-dir
+ls -l pub-dir
+Your output should contain the following:
+
+sysadmin@localhost:/tmp$ ls -l priv-dir                                   
+total 0                                                                         
+-rw-rw-r-- 1 sysadmin sysadmin 0 Feb 24 18:20 priv-file                   
+sysadmin@localhost:/tmp$ ls -l pub-dir                                    
+total 0                                                                         
+-rw-rw-r-- 1 sysadmin sysadmin 0 Feb 24 18:20 pub-file                    
+sysadmin@localhost:/tmp$
+Notice that for each file listed, the first character of the line is the hyphen, -. This conveys the information that the items are regular files. The first character of the listing indicates the type of file. These file types are listed in the table below:
+
+Character	Meaning
+d	indicates a directory
+-	is a regular file
+l	is a symbolic link
+b	is a block device file
+c	is a character device file
+p	is a pipe file
+s	is a socket file
+The next nine characters are in three groups of three characters.
+
+The first group of three characters is the user owner's permissions:
+
+-rw-rw-r-- 1 sysadmin sysadmin 0 Apr 11 21:27 pub-file 
+The next three characters are the group owner's permissions:
+
+-rw-rw-r-- 1 sysadmin sysadmin 0 Apr 11 21:27 pub-file
+The last three characters represent everyone else's permissions (referred to as "others"):
+
+-rw-rw-r-- 1 sysadmin sysadmin 0 Apr 11 21:27 pub-file
+When viewing permissions, r indicates the read permission, w indicates the write permission and x indicates execute permission. A - character indicates that that permission has not been granted.
+
+Following the permissions is a link count number, indicating how many files are linked to this file. Next, you see the user owner, the group owner, the size of the file, the date/time the file was last modified and the file name.
+
+# MAKING A DIRECTORY PRIVATE
+
+If you want to make a directory more private use the chmod command to remove permissions that others have on the directory. Using the -d option with the ls command will list directory entries instead of contents.
+
+Use the ls -ld command to view permissions for the priv-dir directory, then use the chmod command to remove the others' permissions for read and execute:
+
+ls -ld priv-dir/
+chmod o-rx priv-dir/
+sysadmin@localhost:/tmp$ ls -ld priv-dir/                                 
+drwxrwxr-x 2 sysadmin sysadmin 4096 Feb 24 18:20 priv-dir/                
+sysadmin@localhost:/tmp$ chmod o-rx priv-dir/
+Finally, use the same ls command to verify the change in permissions. The output now shows that others have no permission or access to the priv-dir directory:
+
+ls -ld priv-dir/
+sysadmin@localhost:/tmp$ ls -ld priv-dir/                                 
+drwxrwx--- 2 sysadmin sysadmin 23 Feb 24 18:20 priv-dir/                
+sysadmin@localhost:/tmp$
+You can use the chmod command to modify the permissions for others by using an o character followed by either a + character or a - character to add or subtract permissions. The = character can be used to set an exact permission.
+
+You could also use a u character instead of an o character to modify the permissions of the user owner. Use a g character if you want to change permissions for the group owner. This method of changing permissions is referred to as symbolic since it uses letters to represent permission groups. The u, g, o or user, group, others notation may be easier to use than the octal method which relies on a binary translation of an octal (base 8) number:
+
+To modify everyone's permissions use an a character instead of o, u or g.
+
+Examples:
+
+chmod a+x file	Gives everyone execute permission
+chmod g-w file	Removes write permission for group owners
+chmod go+r file	Adds read permission for group owner and others
+chmod o=rwx	Sets others permissions to read, write and execute
+
+# MAKING A DIRECTORY Public
+
+If you want to make a directory more public, then you can use the chmod command to add write permission for others:
+
+ls -ld pub-dir/
+chmod o+w pub-dir/
+ls -ld pub-dir/
+Your output now shows that others have write permission on the directory (the ability to add or delete files inside the directory):
+
+sysadmin@localhost:/tmp$ ls -ld pub-dir/                                  
+drwxrwxr-x 2 sysadmin sysadmin 22 Feb 24 18:20 pub-dir/                 
+sysadmin@localhost:/tmp$ chmod o+w pub-dir/                               
+sysadmin@localhost:/tmp$ ls -ld pub-dir/                                 
+drwxrwxrwx 2 sysadmin sysadmin 22 Feb 24 18:20 pub-dir/               
+sysadmin@localhost:/tmp$
+
+# Removing permissions from the group
+
+Use the chmod command to remove any permission from the group and others on the priv-file:
+
+ls -l priv-dir/priv-file
+chmod g-rw,o-r priv-dir/priv-file
+ls -l priv-dir/priv-file
+
+# Grant all users the same read and write permission for the pub-file:
+
+ls -l pub-dir/pub-file
+chmod a=rw pub-dir/pub-file
+ls -l pub-dir/pub-file
+
+# File ownership
+
+There are two commands that can affect the ownership of files: the chown command and the chgrp command. The chown command can only be executed by the root user and it can change both the user and group that owns a file.
+
+The chgrp command can be used by either the user who owns a file or by the root user.
+
+The chgrp command only changes the group that owns a file.
+
+When a non-root user uses the chgrp command, they can only change the group ownership to a group of which they are a member. The root user can use chgrp to change the group ownership of any file to any group.
+
+# FILE permissions
+
+Setuid
+When the setuid permission is set on an executable binary file (a program) the binary file is run as the owner of the file, not as the user who executed it. This permission is set on a handful of system utilities so that they can be run by normal users, but executed with the permissions of root, providing access to system files that the normal user doesn't normally have access to.
+
+Like the read, write and execute permissions, special permissions can be set with the chmod command, using either the symbolic and octal methods.
+
+To add the setuid permission symbolically, run:
+
+chmod u+s file
+To add the setuid permission numerically, add 4000 to the file's existing permissions (assume the file originally had 775 for its permission in the following example):
+
+chmod 4775 file
+To remove the setuid permission symbolically, run:
+
+chmod u-s file
+To remove the setuid permission numerically, subtract 4000 from the file's existing permissions:
+
+chmod 0775 file
+Previously, we set permission with the octal method using three-digit codes. When a three-digit code is provided, the chmod command assumes that the first digit before the three-digit code is 0. Only when four digits are specified is a special permission set.
+
+If three digits are specified when changing the permission on a file that already has a special permission set, the first digit will be set to 0, and the special permission will be removed from the file.
+
+#  Setgid
+The setgid permission is similar to setuid, but it makes use of the group owner permissions. There are two forms of setgid permissions: setgid on a file and setgid on a directory. The behavior of setgid depends on whether it is set on a file or directory.
+
+#  Setgid on Files
+The setgid permission on a file is very similar to setuid; it allows a user to run an executable binary file in a manner that provides them additional (temporary) group access. The system allows the user running the command to effectively belong to the group that owns the file, but only in the setgid program.
+
+A good example of the setgid permission on an executable file is the
+
+# Setgid on Directories
+When set on a directory, the setgid permission causes files created in the directory to be owned by the group that owns the directory automatically. This behavior is contrary to how new file group ownership would normally function, as by default new files are group owned by the primary group of the user who created the file.
+
+# Setting Setgid
+Use the following syntax to add the setgid permission symbolically:
+
+chmod g+s <file|directory>
+To add the setgid permission numerically, add 2000 to the file's existing permissions (assume in the following example that the directory originally had 775 for its permissions):
+
+chmod 2775 <file|directory>
+To remove the setgid permission symbolically, run:
+
+chmod g-s <file|directory>
+To remove the setgid permission numerically, subtract 2000 from the file's existing permissions:
+
+chmod 0775 <file|directory>
+
+# Sticky Bit
+The sticky bit permission is used to prevent other users from deleting files that they do not own in a shared directory. Recall that any user with write permission on a directory can create files in that directory, as well as delete any file in the directory, even if they do not own the file!
+
+To set the sticky bit permission symbolically, execute a command like the following:
+
+chmod o+t <directory>
+To set the sticky bit permission numerically, add 1000 to the directory's existing permissions (assume the directory in the following example originally had 775 for its permissions):
+
+chmod 1775 <file|directory>
+To remove the sticky permission symbolically, run:
+
+chmod o-t <directory>
+‌⁠​​⁠​To remove the sticky bit permission numerically, subtract 1000 from the directory's existing permissions:
+
+chmod 0775 <directory>
+
+# LISTING DIRECTORY information
+
+Using the -d option for the ls command lists directory information; combined with the -l option it shows ownership and permissions for the directory files. List the details of the /tmp and /var/tmp directories:
+
+ls -ld /tmp
+ls -ld /var/tmp
+The output shows the permissions on these directories to be the same:
+
+sysadmin@localhost:~$ ls -ld /tmp                                         
+drwxrwxrwt 1 root root 4096 Feb 24 20:19 /tmp                                   
+sysadmin@localhost:~$ ls -ld /var/tmp                                     
+drwxrwxrwt 2 root root 4096 Jan 18  2021 /var/tmp                         
+sysadmin@localhost:~$
+The /tmp and /var/tmp directories are read, write and executable for everyone. Besides the users' home directories, these two "temporary" directories are the locations in the filesystem where ordinary users can create new files or directories.
+
+This does pose a problem: if all users can create new files, they are also able to delete existing files. This is because the write permission on a directory grants users the ability to add and delete files in a directory.
+
+The t in the execute column for the others permissions indicates that this directory has the sticky bit permission set. This special permission means that even though everyone can add files in these directories, only the user who creates a file can delete that file.
+
+The root user is not affected by this permission as that account can delete all files in the directory, regardless of ownership.
+
+# Hard and Soft Links
+

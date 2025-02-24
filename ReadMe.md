@@ -1199,3 +1199,45 @@ By using the grep command, the output only includes the account information for 
 The /etc/shadow file contains information about users’ passwords. In this exercise you will use several commands to view the data in this file.
 
 
+  # Creating A Group
+The groupadd command can be executed by the root user to create a new group. The command requires only the name of the group to be created. The -g option can be used to specify a group id for the new group:
+
+
+#  Modifying a Group
+The groupmod command can be used to either change the name of a group with the -n option or change the GID for the group with the -g option.
+
+# Consider This
+
+These files with no group name are called orphaned files. To search for all files that are owned by just a GID (not associated with a group name) use the -nogroup option of the find command:
+
+# DELETING A GROUP 
+
+As long as the group to be deleted is not a user's primary group, deleting the group is accomplished by using the groupdel command along with the name of the group:
+
+# Creating a User
+Once you've verified which default values to use and you've gathered the information about the user, then you are ready to create a user account. An example of a useradd command using a few options looks like the following:
+
+
+root@localhost:~# useradd -u 1009 -g users -G sales,research -m -c 'Jane Doe' jane 
+
+
+This example of the useradd command creates a user with a UID of 1009, a primary group of users, supplementary memberships in the sales and research groups, a comment of "Jane Doe", and an account name of jane.
+
+After executing the previous command, the information about the jane user account is automatically added to the /etc/passwd and /etc/shadow files, while the information about supplemental group access is automatically added to the /etc/group and /etc/gshadow files:
+
+# Setting a User Password
+There are several ways for a user password to be changed. The user can execute the passwd command, the administrator can execute the passwd command providing the username as an argument, or graphical tools are also available.
+
+The administrator can use the passwd command to either set the initial password or change the password for the account. For example, if the administrator had created the account jane, then executing passwd jane provides the administrator a prompt to set the password for the jane account. If completed successfully, then the /etc/shadow file will be updated with the user's new password.
+
+# Deleting a User
+The userdel command is used to delete users. When you delete a user account, you also need to decide whether to delete the user's home directory. The user's files may be important to the organization, and there may even be legal requirements to keep the data for a certain amount of time, so be careful not to make this decision lightly. Also, unless you've made backup copies of the data, once you've executed the command to delete the user and their files, there is no reversing the action.
+
+To delete the user jane without deleting the user's home directory /home/jane, execute:
+
+root@localhost:~# userdel jane
+Beware that deleting a user without deleting their home directory means that the user's home directory files will be orphaned and these files will be owned solely by their former UID and GID.
+
+To delete the user, home directory, and mail spool as well, use the -r option:
+
+root@localhost:~# userdel -r jane
